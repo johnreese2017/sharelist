@@ -25,23 +25,35 @@
 ## 安装
 ### Shell
 ````bash
-bash install.sh
+wget https://www.moerats.com/usr/shell/GDList.sh #这里借用moerats的脚本，教程参考https://www.moerats.com/archives/593/
+bash GDList.sh
 ````
+### 添加域名SSL
+``` bash
+wget -N --no-check-certificate https://www.moerats.com/usr/shell/Caddy/caddy_install.sh && chmod +x caddy_install.sh && bash caddy_install.sh install http.filemanager
+```
+编辑配置文件
+``` bash 
+#以下全部内容是一个整体，修改域名、IP、邮箱后一起复制到SSH运行！
+echo "https://xx.com {
+ tls <your e-mail>
+ proxy / <your-ip-address>:33001 {
+    header_upstream Host {host}
+    header_upstream X-Real-IP {remote}
+    header_upstream X-Forwarded-For {remote}
+    header_upstream X-Forwarded-Proto {scheme}
+  }
+ log /var/log/caddy.log
+ gzip
+}" > /usr/local/caddy/Caddyfile
+```
+启动Caddy
+``` bash
+/etc/init.d/caddy restart
+```
 
-### Docker support
-````bash
-docker build -t yourname/sharelist .
 
-docker run -d -v /etc/sharelist:/app/cache -p 33001:33001 --name="sharelist" yourname/sharelist
-````
-
-OR
-
-````bash
-docker-compose up
-````
-
-访问 `http://localhost:33001` 
+访问 `<your-domain>` 
 
 
 ### Heroku
